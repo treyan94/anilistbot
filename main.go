@@ -17,6 +17,10 @@ type searchResponse struct {
 				Native  string `json:"native"`
 				Romaji  string `json:"romaji"`
 			} `json:"title"`
+			CoverImage struct {
+				Large      string `json:"large"`
+				ExtraLarge string `json:"extraLarge"`
+			} `json:"coverImage"`
 		} `json:"media"`
 	} `json:"data"`
 }
@@ -38,13 +42,17 @@ func search(c echo.Context) error {
          native
        }
        description
+       coverImage {
+			extraLarge
+			large
+		}
      }
     }`
 
 	message := map[string]interface{}{
 		"query": query,
 		"variables": map[string]string{
-			"search": "Evangelion",
+			"search": c.QueryParam("q"),
 		},
 	}
 	jsonMarshaled, err := json.Marshal(message)
