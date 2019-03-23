@@ -7,6 +7,7 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -16,7 +17,13 @@ type Configuration struct {
 
 func getConfig() (configuration Configuration) {
 	file, _ := os.Open("config.json")
-	defer file.Close()
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	decoder := json.NewDecoder(file)
 	err := decoder.Decode(&configuration)
 	if err != nil {
@@ -47,23 +54,28 @@ func main() {
 
 func search(q *tb.Query) {
 	if q.Text == "" {
-		b.Answer(q, &tb.QueryResponse{})
+		err := b.Answer(q, &tb.QueryResponse{})
+
+		if err != nil {
+			fmt.Println(err)
+		}
 		return
 	}
-	media := anilist.Search(q.Text).Data.Media
 
-	res := &tb.ArticleResult{
-		URL:         media.SiteUrl,
-		ThumbURL:    media.CoverImage.Medium,
-		Title:       media.Title.English,
-		Text:        media.Description,
-		Description: media.Description,
+	media := anilist.Search(q.Text)
+	results := make(tb.Results, len(media.Anime.Results))
+
+	for i, result := range media.Anime.Results {
+		res := &tb.ArticleResult{
+			URL:         result.SiteUrl,
+			ThumbURL:    result.CoverImage.Medium,
+			Title:       result.Title.UserPreferred,
+			Text:        result.SiteUrl,
+			Description: result.Description,
+		}
+		results[i] = res
+		results[i].SetResultID(strconv.Itoa(i))
 	}
-
-	res.SetResultID("0")
-
-	results := make(tb.Results, 1)
-	results[0] = res
 
 	err := b.Answer(q, &tb.QueryResponse{
 		Results:   results,

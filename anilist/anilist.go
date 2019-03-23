@@ -8,12 +8,20 @@ import (
 )
 
 type SearchResponse struct {
-	Data struct {
-		Media `json:"media"`
-	} `json:"data"`
+	Data `json:"data"`
 }
 
-type Media struct {
+type Data struct {
+	Anime `json:"anime"`
+}
+
+type Anime struct {
+	Results `json:"results"`
+}
+
+type Results []Result
+
+type Result struct {
 	Description string `json:"description"`
 	Title       `json:"title"`
 	CoverImage  `json:"coverImage"`
@@ -21,9 +29,10 @@ type Media struct {
 }
 
 type Title struct {
-	English string `json:"english"`
-	Native  string `json:"native"`
-	Romaji  string `json:"romaji"`
+	English       string `json:"english"`
+	Native        string `json:"native"`
+	Romaji        string `json:"romaji"`
+	UserPreferred string `json:"userPreferred"`
 }
 
 type CoverImage struct {
@@ -34,27 +43,26 @@ type CoverImage struct {
 
 func Search(q string) SearchResponse {
 	query := `
-    query ($search: String) {
-     Media (search: $search, type: ANIME) {
-       title {
-         romaji
-         english
-         native
-       }
-       description
-       coverImage {
-			extraLarge
-			large
-			medium
-		}
-		siteUrl
-     }
+    query ($search: String, $isAdult: Boolean) { 
+      anime: Page (perPage: 3) { 
+        results: media (type: ANIME, isAdult: $isAdult, search: $search) {
+          siteUrl
+          title { 
+           userPreferred 
+          } 
+          coverImage {
+           medium
+          }
+		  description
+        } 
+      }
     }`
 
 	message := map[string]interface{}{
 		"query": query,
-		"variables": map[string]string{
-			"search": q,
+		"variables": map[string]interface{}{
+			"search":  q,
+			"isAdult": false,
 		},
 	}
 	jsonMarshaled, err := json.Marshal(message)
