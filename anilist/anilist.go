@@ -3,29 +3,36 @@ package anilist
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/labstack/echo"
 	"log"
 	"net/http"
 )
 
-type searchResponse struct {
+type SearchResponse struct {
 	Data struct {
-		Media struct {
-			Description string `json:"description"`
-			Title       struct {
-				English string `json:"english"`
-				Native  string `json:"native"`
-				Romaji  string `json:"romaji"`
-			} `json:"title"`
-			CoverImage struct {
-				Large      string `json:"large"`
-				ExtraLarge string `json:"extraLarge"`
-			} `json:"coverImage"`
-		} `json:"media"`
+		Media `json:"media"`
 	} `json:"data"`
 }
 
-func Search(c echo.Context) error {
+type Media struct {
+	Description string `json:"description"`
+	Title       `json:"title"`
+	CoverImage  `json:"coverImage"`
+	SiteUrl     string `json:"siteUrl"`
+}
+
+type Title struct {
+	English string `json:"english"`
+	Native  string `json:"native"`
+	Romaji  string `json:"romaji"`
+}
+
+type CoverImage struct {
+	Medium     string `json:"medium"`
+	Large      string `json:"large"`
+	ExtraLarge string `json:"extraLarge"`
+}
+
+func Search(q string) SearchResponse {
 	query := `
     query ($search: String) {
      Media (search: $search, type: ANIME) {
@@ -38,14 +45,16 @@ func Search(c echo.Context) error {
        coverImage {
 			extraLarge
 			large
+			medium
 		}
+		siteUrl
      }
     }`
 
 	message := map[string]interface{}{
 		"query": query,
 		"variables": map[string]string{
-			"search": c.QueryParam("q"),
+			"search": q,
 		},
 	}
 	jsonMarshaled, err := json.Marshal(message)
@@ -58,12 +67,12 @@ func Search(c echo.Context) error {
 		log.Fatalln(err)
 	}
 
-	var result searchResponse
+	var result SearchResponse
 
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return c.JSON(http.StatusOK, result)
+	return result
 }
