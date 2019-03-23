@@ -11,14 +11,14 @@ import (
 type searchResponse struct {
 	Data struct {
 		Media struct {
-			Description string
+			Description string `json:"description"`
 			Title       struct {
-				English string
-				Native  string
-				Romaji  string
-			}
-		}
-	}
+				English string `json:"english"`
+				Native  string `json:"native"`
+				Romaji  string `json:"romaji"`
+			} `json:"title"`
+		} `json:"media"`
+	} `json:"data"`
 }
 
 func main() {
@@ -59,7 +59,10 @@ func search(c echo.Context) error {
 
 	var result searchResponse
 
-	json.NewDecoder(resp.Body).Decode(&result)
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	return c.JSON(http.StatusOK, result)
 }
