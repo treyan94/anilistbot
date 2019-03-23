@@ -50,7 +50,6 @@ func search(q *tb.Query) {
 		b.Answer(q, &tb.QueryResponse{})
 		return
 	}
-	fmt.Println(q.Text)
 	media := anilist.Search(q.Text).Data.Media
 
 	res := &tb.ArticleResult{
