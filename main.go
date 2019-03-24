@@ -7,7 +7,9 @@ import (
 	tb "gopkg.in/tucnak/telebot.v2"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -62,7 +64,10 @@ func search(q *tb.Query) {
 		return
 	}
 
-	media := anilist.Search(q.Text)
+	isAdult, _ := regexp.MatchString("/a", q.Text)
+	searchQ := strings.Replace(q.Text, "/a", "", 1)
+	media := anilist.Search(searchQ, isAdult)
+
 	results := make(tb.Results, len(media.Anime.Results))
 
 	for i, result := range media.Anime.Results {

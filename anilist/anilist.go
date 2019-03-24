@@ -7,44 +7,10 @@ import (
 	"net/http"
 )
 
-type SearchResponse struct {
-	Data `json:"data"`
-}
-
-type Data struct {
-	Anime `json:"anime"`
-}
-
-type Anime struct {
-	Results `json:"results"`
-}
-
-type Results []Result
-
-type Result struct {
-	Description string `json:"description"`
-	Title       `json:"title"`
-	CoverImage  `json:"coverImage"`
-	SiteUrl     string `json:"siteUrl"`
-}
-
-type Title struct {
-	English       string `json:"english"`
-	Native        string `json:"native"`
-	Romaji        string `json:"romaji"`
-	UserPreferred string `json:"userPreferred"`
-}
-
-type CoverImage struct {
-	Medium     string `json:"medium"`
-	Large      string `json:"large"`
-	ExtraLarge string `json:"extraLarge"`
-}
-
-func Search(q string) SearchResponse {
+func Search(q string, isAdult bool) SearchResponse {
 	query := `
     query ($search: String, $isAdult: Boolean) { 
-      anime: Page (perPage: 3) { 
+      anime: Page (perPage: 10) { 
         results: media (type: ANIME, isAdult: $isAdult, search: $search) {
           siteUrl
           title { 
@@ -58,19 +24,15 @@ func Search(q string) SearchResponse {
       }
     }`
 
-	message := map[string]interface{}{
-		"query": query,
-		"variables": map[string]interface{}{
-			"search":  q,
-			"isAdult": false,
+	reqMarshaled, err := json.Marshal(Request{
+		Query: query,
+		Variables: Variables{
+			Search:  q,
+			IsAdult: isAdult,
 		},
-	}
-	jsonMarshaled, err := json.Marshal(message)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	})
 
-	resp, err := http.Post("https://graphql.anilist.co", "application/json", bytes.NewBuffer(jsonMarshaled))
+	resp, err := http.Post("https://graphql.anilist.co", "application/json", bytes.NewBuffer(reqMarshaled))
 	if err != nil {
 		log.Fatalln(err)
 	}
