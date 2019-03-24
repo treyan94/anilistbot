@@ -1,7 +1,7 @@
 package main
 
 import (
-	"../anilistbot/anilist"
+	"anilistbot/anilist"
 	"encoding/json"
 	"fmt"
 	tb "gopkg.in/tucnak/telebot.v2"
