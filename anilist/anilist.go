@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func Search(q string, isAdult bool) SearchResponse {
+func Search(searchVariables SearchVariables) (result SearchResponse) {
 	query := `
     query ($search: String, $isAdult: Boolean) { 
       anime: Page (perPage: 10) { 
@@ -25,11 +25,8 @@ func Search(q string, isAdult bool) SearchResponse {
     }`
 
 	reqMarshaled, err := json.Marshal(Request{
-		Query: query,
-		Variables: Variables{
-			Search:  q,
-			IsAdult: isAdult,
-		},
+		query,
+		searchVariables,
 	})
 
 	resp, err := http.Post("https://graphql.anilist.co", "application/json", bytes.NewBuffer(reqMarshaled))
@@ -37,10 +34,7 @@ func Search(q string, isAdult bool) SearchResponse {
 		log.Fatalln(err)
 	}
 
-	var result SearchResponse
-
-	err = json.NewDecoder(resp.Body).Decode(&result)
-	if err != nil {
+	if err = json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		log.Fatalln(err)
 	}
 

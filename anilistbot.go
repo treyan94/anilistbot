@@ -63,7 +63,11 @@ func search(q *telebot.Query) {
 	}
 
 	isAdult, searchQ := parseQueryText(q.Text)
-	searchResults := anilist.Search(searchQ, isAdult).Anime.Results
+
+	searchResults := anilist.Search(anilist.SearchVariables{
+		IsAdult: isAdult,
+		Search:  searchQ,
+	}).Anime.Results
 
 	err := bot.Answer(q, &telebot.QueryResponse{
 		Results:   parsedResults(searchResults),

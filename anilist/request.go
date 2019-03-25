@@ -1,11 +1,11 @@
 package anilist
 
 type Request struct {
-	Query     string `json:"query"`
-	Variables `json:"variables"`
+	Query           string `json:"query"`
+	SearchVariables `json:"variables"`
 }
 
-type Variables struct {
+type SearchVariables struct {
 	Search  string `json:"search"`
 	IsAdult bool   `json:"isAdult"`
 }
