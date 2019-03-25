@@ -2,6 +2,7 @@ package main
 
 import (
 	"anilistbot/anilist"
+	"anilistbot/anilist/anime"
 	"github.com/joomcode/errorx"
 	"gopkg.in/tucnak/telebot.v2"
 	"log"
@@ -65,7 +66,7 @@ func search(q *telebot.Query) {
 
 	isAdult, searchQ := parseQueryText(q.Text)
 
-	searchResults := anilist.Search(anilist.SearchVariables{
+	searchResults := anilist.SearchAnime(anime.SearchVariables{
 		IsAdult: isAdult,
 		Search:  searchQ,
 	}).Anime.Results
@@ -80,7 +81,7 @@ func search(q *telebot.Query) {
 	}
 }
 
-func parsedResults(searchResults anilist.Results) telebot.Results {
+func parsedResults(searchResults anime.Results) telebot.Results {
 	parsedResults := make(telebot.Results, len(searchResults))
 
 	for i, result := range searchResults {

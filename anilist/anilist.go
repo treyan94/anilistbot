@@ -1,6 +1,7 @@
 package anilist
 
 import (
+	"anilistbot/anilist/anime"
 	"bytes"
 	"encoding/json"
 	"github.com/joomcode/errorx"
@@ -8,7 +9,7 @@ import (
 	"net/http"
 )
 
-func Search(searchVariables SearchVariables) (result SearchResponse) {
+func SearchAnime(searchVariables anime.SearchVariables) (result anime.SearchResponse) {
 	query := `
     query ($search: String, $isAdult: Boolean) { 
       anime: Page (perPage: 10) { 
@@ -25,9 +26,9 @@ func Search(searchVariables SearchVariables) (result SearchResponse) {
       }
     }`
 
-	reqMarshaled, err := json.Marshal(Request{
-		query,
-		searchVariables,
+	reqMarshaled, err := json.Marshal(anime.Request{
+		Query:           query,
+		SearchVariables: searchVariables,
 	})
 
 	resp, err := http.Post("https://graphql.anilist.co", "application/json", bytes.NewBuffer(reqMarshaled))

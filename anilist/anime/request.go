@@ -1,4 +1,4 @@
-package anilist
+package anime
 
 type Request struct {
 	Query           string `json:"query"`

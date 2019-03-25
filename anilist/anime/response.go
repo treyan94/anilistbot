@@ -1,4 +1,4 @@
-package anilist
+package anime
 
 type SearchResponse struct {
 	Data `json:"data"`
