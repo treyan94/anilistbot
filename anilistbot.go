@@ -59,30 +59,39 @@ func search(q *telebot.Query) {
 		return
 	}
 
-	isAdult, _ := regexp.MatchString("/a", q.Text)
-	searchQ := strings.Replace(q.Text, "/a", "", 1)
+	isAdult, searchQ := parseQueryText(q.Text)
 	searchResults := anilist.Search(searchQ, isAdult).Anime.Results
 
-	results := make(telebot.Results, len(searchResults))
-
-	for i, result := range searchResults {
-		res := &telebot.ArticleResult{
-			URL:         result.SiteUrl,
-			ThumbURL:    result.CoverImage.Medium,
-			Title:       result.Title.UserPreferred,
-			Text:        result.SiteUrl,
-			Description: result.Description,
-		}
-		results[i] = res
-		results[i].SetResultID(strconv.Itoa(i))
-	}
-
 	err := bot.Answer(q, &telebot.QueryResponse{
-		Results:   results,
+		Results:   parsedResults(searchResults),
 		CacheTime: 0,
 	})
 
 	if err != nil {
 		log.Println(err)
 	}
+}
+
+func parsedResults(searchResults anilist.Results) telebot.Results {
+	parsedResults := make(telebot.Results, len(searchResults))
+
+	for i, result := range searchResults {
+		parsedResults[i] = &telebot.ArticleResult{
+			URL:         result.SiteUrl,
+			ThumbURL:    result.CoverImage.Medium,
+			Title:       result.Title.UserPreferred,
+			Text:        result.SiteUrl,
+			Description: result.Description,
+		}
+		parsedResults[i].SetResultID(strconv.Itoa(i))
+	}
+
+	return parsedResults
+}
+
+func parseQueryText(text string) (isAdult bool, query string) {
+	isAdult, _ = regexp.MatchString("/a", text)
+	query = strings.Replace(text, "/a", "", 1)
+
+	return isAdult, query
 }
