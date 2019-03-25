@@ -11,13 +11,18 @@ import (
 	"time"
 )
 
-var apiKey = func() string {
-	args := os.Args[1:]
-	if len(args) == 0 {
+var apiKey = func() (key string) {
+	key = os.Getenv("ANI_BOT_KEY")
+
+	if args := os.Args[1:]; len(args) != 0 {
+		key = args[0]
+	}
+
+	if key == "" {
 		log.Fatal("provide telegram bot api key as first argument")
 	}
 
-	return args[0]
+	return key
 }()
 
 var bot = func() (bot *telebot.Bot) {
@@ -51,9 +56,7 @@ func main() {
 
 func search(q *telebot.Query) {
 	if q.Text == "" {
-		err := bot.Answer(q, &telebot.QueryResponse{})
-
-		if err != nil {
+		if err := bot.Answer(q, &telebot.QueryResponse{}); err != nil {
 			log.Println(err)
 		}
 		return
