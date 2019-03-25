@@ -2,8 +2,7 @@ package main
 
 import (
 	"anilistbot/anilist"
-	"fmt"
-	tb "gopkg.in/tucnak/telebot.v2"
+	"gopkg.in/tucnak/telebot.v2"
 	"log"
 	"os"
 	"regexp"
@@ -12,13 +11,19 @@ import (
 	"time"
 )
 
-var bot = getBot()
-var apiKey = getApiKey()
+var apiKey = func() string {
+	args := os.Args[1:]
+	if len(args) == 0 {
+		log.Fatal("provide telegram bot api key as first argument")
+	}
 
-func getBot() (bot *tb.Bot) {
-	bot, err := tb.NewBot(tb.Settings{
+	return args[0]
+}()
+
+var bot = func() (bot *telebot.Bot) {
+	bot, err := telebot.NewBot(telebot.Settings{
 		Token: apiKey,
-		Poller: &tb.LongPoller{
+		Poller: &telebot.LongPoller{
 			Timeout: 10 * time.Second,
 		},
 	})
@@ -28,49 +33,40 @@ func getBot() (bot *tb.Bot) {
 	}
 
 	return bot
-}
-
-func getApiKey() string {
-	args := os.Args[1:]
-	if len(args) == 0 {
-		log.Fatal("provide telegram bot api key as first argument")
-	}
-
-	return args[0]
-}
+}()
 
 func main() {
-	bot.Handle("/hello", func(m *tb.Message) {
+	bot.Handle("/hello", func(m *telebot.Message) {
 		_, err := bot.Send(m.Sender, "hello world")
 
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 	})
 
-	bot.Handle(tb.OnQuery, search)
+	bot.Handle(telebot.OnQuery, search)
 
 	bot.Start()
 }
 
-func search(q *tb.Query) {
+func search(q *telebot.Query) {
 	if q.Text == "" {
-		err := bot.Answer(q, &tb.QueryResponse{})
+		err := bot.Answer(q, &telebot.QueryResponse{})
 
 		if err != nil {
-			fmt.Println(err)
+			log.Println(err)
 		}
 		return
 	}
 
 	isAdult, _ := regexp.MatchString("/a", q.Text)
 	searchQ := strings.Replace(q.Text, "/a", "", 1)
-	media := anilist.Search(searchQ, isAdult)
+	searchResults := anilist.Search(searchQ, isAdult).Anime.Results
 
-	results := make(tb.Results, len(media.Anime.Results))
+	results := make(telebot.Results, len(searchResults))
 
-	for i, result := range media.Anime.Results {
-		res := &tb.ArticleResult{
+	for i, result := range searchResults {
+		res := &telebot.ArticleResult{
 			URL:         result.SiteUrl,
 			ThumbURL:    result.CoverImage.Medium,
 			Title:       result.Title.UserPreferred,
@@ -81,12 +77,12 @@ func search(q *tb.Query) {
 		results[i].SetResultID(strconv.Itoa(i))
 	}
 
-	err := bot.Answer(q, &tb.QueryResponse{
+	err := bot.Answer(q, &telebot.QueryResponse{
 		Results:   results,
 		CacheTime: 0,
 	})
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 	}
 }
