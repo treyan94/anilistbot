@@ -1,0 +1,17 @@
+{
+	"ImportPath": "anilistbot",
+	"GoVersion": "go1.12",
+	"GodepVersion": "v80",
+	"Deps": [
+		{
+			"ImportPath": "github.com/pkg/errors",
+			"Comment": "v0.8.1-24-g27936f6",
+			"Rev": "27936f6d90f9c8e1145f11ed52ffffbfdb9e0af7"
+		},
+		{
+			"ImportPath": "gopkg.in/tucnak/telebot.v2",
+			"Comment": "ver2.0-64-ge6cfaa8",
+			"Rev": "e6cfaa833930549e4d3aff4af1b9d502b2114d52"
+		}
+	]
+}
