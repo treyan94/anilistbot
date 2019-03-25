@@ -2,6 +2,7 @@ package main
 
 import (
 	"anilistbot/anilist"
+	"github.com/joomcode/errorx"
 	"gopkg.in/tucnak/telebot.v2"
 	"log"
 	"os"
@@ -34,7 +35,7 @@ var bot = func() (bot *telebot.Bot) {
 	})
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Error: %+v", errorx.Decorate(err, "this could be so much better"))
 	}
 
 	return bot
@@ -45,7 +46,7 @@ func main() {
 		_, err := bot.Send(m.Sender, "hello world")
 
 		if err != nil {
-			log.Println(err)
+			HandleErr(err)
 		}
 	})
 
@@ -57,7 +58,7 @@ func main() {
 func search(q *telebot.Query) {
 	if q.Text == "" {
 		if err := bot.Answer(q, &telebot.QueryResponse{}); err != nil {
-			log.Println(err)
+			HandleErr(err)
 		}
 		return
 	}
@@ -75,7 +76,7 @@ func search(q *telebot.Query) {
 	})
 
 	if err != nil {
-		log.Println(err)
+		HandleErr(err)
 	}
 }
 
@@ -101,4 +102,8 @@ func parseQueryText(text string) (isAdult bool, query string) {
 	query = strings.Replace(text, "/a", "", 1)
 
 	return isAdult, query
+}
+
+func HandleErr(err error) {
+	log.Printf("Error: %+v", errorx.Decorate(err, "this could be so much better"))
 }

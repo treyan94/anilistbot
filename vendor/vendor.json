@@ -3,16 +3,22 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "/2Xtt5BQFz1OC+kLuDmMeGxR14k=",
+			"path": "github.com/joomcode/errorx",
+			"revision": "1eb1095df7bf345a5267c30271a849ab0c76d1c2",
+			"revisionTime": "2019-03-06T15:00:31Z"
+		},
+		{
 			"checksumSHA1": "CUU7ZZtxuc1mpbM8XKrSTNiy/yM=",
+			"comment": "v0.8.1-24-g27936f6",
 			"path": "github.com/pkg/errors",
-			"revision": "27936f6d90f9c8e1145f11ed52ffffbfdb9e0af7",
-			"revisionTime": "2019-02-27T00:00:51Z"
+			"revision": "27936f6d90f9c8e1145f11ed52ffffbfdb9e0af7"
 		},
 		{
 			"checksumSHA1": "jSy73Ik8DMA9ROXFg9DYboVssOY=",
+			"comment": "ver2.0-64-ge6cfaa8",
 			"path": "gopkg.in/tucnak/telebot.v2",
-			"revision": "e6cfaa833930549e4d3aff4af1b9d502b2114d52",
-			"revisionTime": "2019-02-13T11:08:36Z"
+			"revision": "e6cfaa833930549e4d3aff4af1b9d502b2114d52"
 		}
 	],
 	"rootPath": "anilistbot"

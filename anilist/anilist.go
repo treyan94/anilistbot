@@ -3,6 +3,7 @@ package anilist
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/joomcode/errorx"
 	"log"
 	"net/http"
 )
@@ -31,12 +32,16 @@ func Search(searchVariables SearchVariables) (result SearchResponse) {
 
 	resp, err := http.Post("https://graphql.anilist.co", "application/json", bytes.NewBuffer(reqMarshaled))
 	if err != nil {
-		log.Fatalln(err)
+		HandleErr(err)
 	}
 
 	if err = json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		log.Fatalln(err)
+		HandleErr(err)
 	}
 
 	return result
+}
+
+func HandleErr(err error) {
+	log.Printf("Error: %+v", errorx.Decorate(err, "this could be so much better"))
 }
