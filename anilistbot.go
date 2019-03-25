@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -72,30 +71,13 @@ func search(q *telebot.Query) {
 	}).Anime.Results
 
 	err := bot.Answer(q, &telebot.QueryResponse{
-		Results:   parsedResults(searchResults),
+		Results:   anime.ParseResults(searchResults),
 		CacheTime: 0,
 	})
 
 	if err != nil {
 		HandleErr(err)
 	}
-}
-
-func parsedResults(searchResults anime.Results) telebot.Results {
-	parsedResults := make(telebot.Results, len(searchResults))
-
-	for i, result := range searchResults {
-		parsedResults[i] = &telebot.ArticleResult{
-			URL:         result.SiteUrl,
-			ThumbURL:    result.CoverImage.Medium,
-			Title:       result.Title.UserPreferred,
-			Text:        result.SiteUrl,
-			Description: result.Description,
-		}
-		parsedResults[i].SetResultID(strconv.Itoa(i))
-	}
-
-	return parsedResults
 }
 
 func parseQueryText(text string) (isAdult bool, query string) {
