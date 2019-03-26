@@ -1,13 +1,14 @@
 package main
 
 import (
+	"anilistbot/anilist"
 	"anilistbot/anilist/anime"
+	"anilistbot/anilist/character"
+	"anilistbot/query_parser"
 	"github.com/joomcode/errorx"
 	"gopkg.in/tucnak/telebot.v2"
 	"log"
 	"os"
-	"regexp"
-	"strings"
 	"time"
 )
 
@@ -62,28 +63,32 @@ func search(q *telebot.Query) {
 		return
 	}
 
-	isAdult, searchQ := parseQueryText(q.Text)
+	parsedQuery := query_parser.Parse(q.Text)
+	searchResults := *new(anilist.Results)
 
-	searchResults := anime.Search(anime.SearchVariables{
-		IsAdult: isAdult,
-		Search:  searchQ,
-	}).Anime.Results
+	switch parsedQuery.Type {
+	case "anime":
+		searchResults = anime.Search(anime.SearchVariables{
+			IsAdult: parsedQuery.IsAdult,
+			Search:  parsedQuery.QueryText,
+		})
+
+	case "char":
+		searchResults = character.Search(character.SearchVariables{
+			Search: parsedQuery.QueryText,
+		})
+	}
+
+	parsed := searchResults.Parse()
 
 	err := bot.Answer(q, &telebot.QueryResponse{
-		Results:   anime.ParseResults(searchResults),
+		Results:   parsed,
 		CacheTime: 0,
 	})
 
 	if err != nil {
 		HandleErr(err)
 	}
-}
-
-func parseQueryText(text string) (isAdult bool, query string) {
-	isAdult, _ = regexp.MatchString("/a", text)
-	query = strings.Replace(text, "/a", "", 1)
-
-	return isAdult, query
 }
 
 func HandleErr(err error) {

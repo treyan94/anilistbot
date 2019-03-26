@@ -1,4 +1,4 @@
-package anime
+package character
 
 import (
 	"anilistbot/anilist"
@@ -9,18 +9,19 @@ import (
 
 func Search(searchVariables SearchVariables) (result SearchResponse) {
 	query := `
-    query ($search: String, $isAdult: Boolean) { 
-      anime: Page (perPage: 10) { 
-        results: media (type: ANIME, isAdult: $isAdult, search: $search) {
-          siteUrl
-          title { 
-           userPreferred 
-          } 
-          coverImage {
-           medium
+    query ($search: String) {
+      page: Page(perPage: 10) {
+        characters: characters(search: $search) {
+          name {
+            first
+            last
           }
-		  description
-        } 
+          image {
+            medium
+          }
+          siteUrl
+          description
+        }
       }
     }`
 

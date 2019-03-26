@@ -1,5 +1,10 @@
 package anime
 
+import (
+	"gopkg.in/tucnak/telebot.v2"
+	"strconv"
+)
+
 type SearchResponse struct {
 	Data `json:"data"`
 }
@@ -13,6 +18,23 @@ type Anime struct {
 }
 
 type Results []Result
+
+func (r Results) Parse() telebot.Results {
+	parsedResults := make(telebot.Results, len(r))
+
+	for i, result := range r {
+		parsedResults[i] = &telebot.ArticleResult{
+			URL:         result.SiteUrl,
+			ThumbURL:    result.CoverImage.Medium,
+			Title:       result.Title.UserPreferred,
+			Text:        result.SiteUrl,
+			Description: result.Description,
+		}
+		parsedResults[i].SetResultID(strconv.Itoa(i))
+	}
+
+	return parsedResults
+}
 
 type Result struct {
 	Description string `json:"description"`
