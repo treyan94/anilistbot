@@ -1,9 +1,6 @@
 package main
 
 import (
-	"anilistbot/anilist"
-	"anilistbot/anilist/anime"
-	"anilistbot/anilist/character"
 	"anilistbot/query_parser"
 	"gopkg.in/tucnak/telebot.v2"
 	"log"
@@ -54,25 +51,8 @@ func search(q *telebot.Query) {
 		return
 	}
 
-	parsedQuery := query_parser.Parse(q.Text)
-	searchResults := *new(anilist.Results)
-
-	switch parsedQuery.Type {
-	case "anime":
-		searchResults = anime.Search(anime.SearchVariables{
-			IsAdult: parsedQuery.IsAdult,
-			Search:  parsedQuery.QueryText,
-		})
-	case "char":
-		searchResults = character.Search(character.SearchVariables{
-			Search: parsedQuery.QueryText,
-		})
-	}
-
-	parsed := searchResults.Parse()
-
 	err := bot.Answer(q, &telebot.QueryResponse{
-		Results:   parsed,
+		Results:   query_parser.Parse(q.Text).Parse(),
 		CacheTime: 0,
 	})
 

@@ -2,9 +2,7 @@ package character
 
 import (
 	"anilistbot/anilist"
-	"bytes"
 	"encoding/json"
-	"net/http"
 )
 
 const query string = `
@@ -24,18 +22,10 @@ const query string = `
       }
     }`
 
-func Search(searchVariables SearchVariables) (result SearchResponse) {
-	reqMarshaled, err := json.Marshal(Request{
-		Query:           query,
-		SearchVariables: searchVariables,
-	})
+func Search(searchVariables anilist.SearchVariables) (result SearchResponse) {
+	cat := anilist.NewCategory(query)
 
-	resp, err := http.Post(anilist.URL, "application/json", bytes.NewBuffer(reqMarshaled))
-	if err != nil {
-		anilist.HandleErr(err)
-	}
-
-	if err = json.NewDecoder(resp.Body).Decode(&result); err != nil {
+	if err := json.NewDecoder(cat.RespBody(searchVariables)).Decode(&result); err != nil {
 		anilist.HandleErr(err)
 	}
 
