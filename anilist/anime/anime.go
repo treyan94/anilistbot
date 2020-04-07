@@ -7,8 +7,7 @@ import (
 	"net/http"
 )
 
-func Search(searchVariables SearchVariables) (result SearchResponse) {
-	query := `
+const query string = `
     query ($search: String, $isAdult: Boolean) { 
       anime: Page (perPage: 10) { 
         results: media (type: ANIME, isAdult: $isAdult, search: $search) {
@@ -23,6 +22,8 @@ func Search(searchVariables SearchVariables) (result SearchResponse) {
         } 
       }
     }`
+
+func Search(searchVariables SearchVariables) (result SearchResponse) {
 
 	reqMarshaled, err := json.Marshal(Request{
 		Query:           query,
