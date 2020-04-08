@@ -31,7 +31,7 @@ var bot = func() (bot *telebot.Bot) {
 	})
 
 	if err != nil {
-		log.Fatalf("Error: %+v", err)
+		log.Fatal("Error connecting to telegram, please check your api key.")
 	}
 
 	return bot
