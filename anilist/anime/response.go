@@ -19,6 +19,7 @@ type Anime struct {
 
 type Results []Result
 
+// Returns a a formatted telegram response
 func (r Results) Parse() telebot.Results {
 	parsedResults := make(telebot.Results, len(r))
 
@@ -44,9 +45,6 @@ type Result struct {
 }
 
 type Title struct {
-	English       string `json:"english"`
-	Native        string `json:"native"`
-	Romaji        string `json:"romaji"`
 	UserPreferred string `json:"userPreferred"`
 }
 

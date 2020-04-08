@@ -15,6 +15,7 @@ func NewCategory(query string) *Category {
 	return &Category{Query: query}
 }
 
+// Performs the search request and returns the response body
 func (c *Category) RespBody(searchVariables SearchVariables) io.ReadCloser {
 	reqMarshaled, err := json.Marshal(Request{
 		Query:           c.Query,

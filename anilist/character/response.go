@@ -19,6 +19,7 @@ type Page struct {
 
 type Characters []Character
 
+// Returns a a formatted telegram response
 func (c Characters) Parse() telebot.Results {
 	parsedResults := make(telebot.Results, len(c))
 

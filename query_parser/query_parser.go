@@ -9,9 +9,16 @@ const adult string = " /a"
 const char string = " /char"
 
 type ParsedQuery struct {
-	QueryText string
-	Type      string
-	IsAdult   bool
+	QueryText string // Search query text
+	Type      string // Search type (currently only anime or character
+	IsAdult   bool   // Indicates of the search should include adult content
+}
+
+func (p ParsedQuery) ToSearchVariable() anilist.SearchVariables {
+	return anilist.SearchVariables{
+		IsAdult: p.IsAdult,
+		Search:  p.QueryText,
+	}
 }
 
 func parse(text string) (p ParsedQuery) {
@@ -22,7 +29,7 @@ func parse(text string) (p ParsedQuery) {
 		p.IsAdult = true
 	}
 
-	p.Type = "anime"
+	p.Type = "anime" // Search type default to anime
 
 	if strings.Contains(text, char) {
 		p.Type = "char"
@@ -34,10 +41,7 @@ func parse(text string) (p ParsedQuery) {
 func Parse(text string) (r anilist.Results) {
 	p := parse(text)
 
-	sv := anilist.SearchVariables{
-		IsAdult: p.IsAdult,
-		Search:  p.QueryText,
-	}
+	sv := p.ToSearchVariable()
 
 	if p.Type == "anime" {
 		return anime.Search(sv)

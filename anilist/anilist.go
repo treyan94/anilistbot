@@ -7,6 +7,7 @@ import (
 
 const URL = "https://graphql.anilist.co"
 
+// Returns a a formatted telegram response
 type Results interface {
 	Parse() telebot.Results
 }
